@@ -4,17 +4,15 @@ import datetime
 import time
 
 
-
-def timeInAndOutHome(all_data, dId=None ):
+def timeInAndOutHome(all_data, dId=None):
     if dId != None:
-        allEntries = [item for item in all_data if  item["dId"] == dId] 
+        allEntries = [item for item in all_data if item["dId"] == dId]
     else:
         allEntries = all_data
 
-    
     sorted_allEntries = sorted(allEntries, key=lambda x: x["time"])
 
-    tiempo_dentro_casa = 0  
+    tiempo_dentro_casa = 0
     tiempo_fuera_casa = 0
 
 # Paso 3: Recorre la lista de objetos y calcula el tiempo acumulado.
@@ -23,7 +21,7 @@ def timeInAndOutHome(all_data, dId=None ):
         data = json.loads(objeto_actual["data"])
 
         objeto_siguiente = sorted_allEntries[i + 1]
-      
+
         tiempo_diferencia = objeto_siguiente["time"] - objeto_actual["time"]
 
         if len(data["wifi_location"]):
@@ -39,32 +37,35 @@ def timeInAndOutHome(all_data, dId=None ):
         dias, horas = divmod(horas, 24)
         return dias, horas, minutos, segundos
 
-    dias_dentro_casa, horas_dentro_casa, minutos_dentro_casa, segundos_dentro_casa = milisegundos_a_dias_horas_minutos_segundos(tiempo_dentro_casa)
-    dias_fuera_casa, horas_fuera_casa, minutos_fuera_casa, segundos_fuera_casa = milisegundos_a_dias_horas_minutos_segundos(tiempo_fuera_casa)
+    dias_dentro_casa, horas_dentro_casa, minutos_dentro_casa, segundos_dentro_casa = milisegundos_a_dias_horas_minutos_segundos(
+        tiempo_dentro_casa)
+    dias_fuera_casa, horas_fuera_casa, minutos_fuera_casa, segundos_fuera_casa = milisegundos_a_dias_horas_minutos_segundos(
+        tiempo_fuera_casa)
     response = {
-        "en_casa":{
+        "en_casa": {
             "dias": int(dias_dentro_casa),
             "horas": int(horas_dentro_casa),
             "minutos": int(minutos_dentro_casa),
             "segundos": int(segundos_dentro_casa)
         },
-        "fuera_de_casa":{
-            
+        "fuera_de_casa": {
+
             "dias": int(dias_fuera_casa),
             "horas": int(horas_fuera_casa),
             "minutos": int(minutos_fuera_casa),
             "segundos": int(segundos_fuera_casa)
 
         }
-        }
+    }
     return response
-
 
 
 all_data = requestDatas("6515cd2bf2295200154f579e")
 response = {}
 device_names_dict = {data["dId"]: data["device_name"] for data in all_data}
 for key, value in device_names_dict.items():
-    response[value] = timeInAndOutHome(all_data, key)
+    response[key] = timeInAndOutHome(all_data, key)
+    response[key]["name"] = value
+
 
 print(response)
