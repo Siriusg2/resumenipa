@@ -1,11 +1,16 @@
 import pymongo
+import os
+from dotenv import load_dotenv
 
+# Cargar variables de entorno desde el archivo .env
 def requestDatas(channel_id, dId=None, startDate=None, endDate=None):
-    host = "app.blipconnection.com" 
-    port = 27017  
-    username = "admin"  
-    password = "iotabserver"  
-    database_name = "iotab" 
+    load_dotenv()
+    host = str(os.getenv("DB_HOST")) 
+    port = int(os.getenv("DB_PORT"))   
+    username = str(os.getenv("DB_USERNAME"))  
+    password = str(os.getenv("DB_PASSWORD"))  
+    database_name = str(os.getenv("DB_NAME"))
+
     client = pymongo.MongoClient(host, port, username=username, password=password)
     db = client[database_name]
     datas_collection = db["datas"]
@@ -37,4 +42,4 @@ def requestDatas(channel_id, dId=None, startDate=None, endDate=None):
        entry["device_name"] = device_names_dict.get(entry["dId"], "Nombre Desconocido")
    
     return result
-requestDatas("6515cd2bf2295200154f579e")
+print(requestDatas("6515cd2bf2295200154f579e"))

@@ -22,6 +22,7 @@ import json
     
 #     print(result)
 def is_outside_home(data):
+  
     try:
         data_dict = json.loads(data)
         wifi_location = data_dict.get("wifi_location", {})
@@ -45,22 +46,26 @@ def walkAverage(all_data):
 
     # Establecer 'time' como índice
     df.set_index('time', inplace=True)
-
+    df['time_column'] = df.index
     # Aplicar la función para determinar si el dispositivo está fuera de casa a cada registro
     df['outside_home'] = df['data'].apply(is_outside_home)
-
+    
     # Crear una columna 'time_next' que contiene el tiempo del siguiente registro por dispositivo
-    df['time_next'] = df.groupby('dId')['time'].shift(-1)
+    # print(df)
+    df['time_next'] = df.groupby('dId')['time_column'].shift(-1)
+    print(df.iloc[0])
 
-    # Calcular la duración de cada evento fuera de casa
-    df['duration'] = df.apply(lambda x: (x['time_next'] - x['time']).total_seconds() if x['outside_home'] else 0, axis=1)
+    # # # Calcular la duración de cada evento fuera de casa
+    # df['duration'] = df.apply(lambda x: (x['time_next'] - x['time_column']).total_seconds() if x['outside_home'] else 0, axis=1)
+    # filtered_df = df[df['outside_home'] == True]
+    # print(filtered_df)
+    
+    # # Filtrar registros solo para los eventos fuera de casa
+    # outside_home_events = df[df['outside_home']]
 
-    # Filtrar registros solo para los eventos fuera de casa
-    outside_home_events = df[df['outside_home']]
+    # # Agrupar por día y dispositivo y calcular el promedio de duración fuera de casa
+    # average_duration = outside_home_events.groupby(['time', 'dId', 'device_name'])['duration'].mean().reset_index()
 
-    # Agrupar por día y dispositivo y calcular el promedio de duración fuera de casa
-    average_duration = outside_home_events.groupby(['time', 'dId', 'device_name'])['duration'].mean().reset_index()
-
-    return average_duration
+    # return average_duration
 all_data = requestDatas("6515cd2bf2295200154f579e")
 print(walkAverage(all_data))
