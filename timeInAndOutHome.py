@@ -45,6 +45,7 @@ def timeInAndOutHome(all_data, dId=None ):
 # Paso 5: Imprime los resultados.
     print("Tiempo acumulado dentro de casa:", int(dias_dentro_casa), "días,", int(horas_dentro_casa), "horas,", int(minutos_dentro_casa), "minutos,", int(segundos_dentro_casa), "segundos")
     print("Tiempo acumulado fuera de casa:", int(dias_fuera_casa), "días,", int(horas_fuera_casa), "horas,", int(minutos_fuera_casa), "minutos,", int(segundos_fuera_casa), "segundos")
-print(timeInAndOutHome(requestDatas("*862095056194456")))
-# datetime.datetime.fromtimestamp(list_in[i]) - datetime.datetime.fromtimestamp(list_in[i + 1])
+    print(f"Total tiempo de prueba: dias:{int(dias_dentro_casa+dias_fuera_casa)}, horas:{int(horas_dentro_casa+horas_fuera_casa)}, minutos:{int(minutos_dentro_casa+minutos_fuera_casa)}, segundos:{int(segundos_dentro_casa+segundos_fuera_casa)}")
+print(timeInAndOutHome(requestDatas("6515cd2bf2295200154f579e")))
+
 

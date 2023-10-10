@@ -1,6 +1,6 @@
 import pymongo
 
-def requestDatas(dId=None, startDate=None, endDate=None):
+def requestDatas(channel_id, dId=None, startDate=None, endDate=None):
     host = "app.blipconnection.com" 
     port = 27017  
     username = "admin"  
@@ -8,11 +8,15 @@ def requestDatas(dId=None, startDate=None, endDate=None):
     database_name = "iotab" 
     client = pymongo.MongoClient(host, port, username=username, password=password)
     db = client[database_name]
-    collection = db["datas"]
+    datas_collection = db["datas"]
+    users_collection = db["users"]
+    users_of_channel = users_collection.find({"channel": channel_id})
+    user_ids = [str(user["_id"]) for user in users_of_channel]
+ 
     if dId != None:
-        allEntries = collection.find({"dId": dId})
+        allEntries = datas_collection.find({"dId": dId})
     else:
-        allEntries = collection.find()
+        allEntries = datas_collection.find({"userId": {"$in": user_ids}})
     if startDate != None and endDate != None:
         result = [item for item in allEntries if item["time"] >= startDate and item["time"] <= endDate] 
     elif startDate != None and endDate == None:
@@ -21,5 +25,6 @@ def requestDatas(dId=None, startDate=None, endDate=None):
         result = [item for item in allEntries if  item["time"] <= endDate] 
     else:
         result = allEntries
-    return result
 
+    return result
+requestDatas("6515cd2bf2295200154f579e")

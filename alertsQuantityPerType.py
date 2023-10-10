@@ -24,4 +24,4 @@ def alertsQuantityPerType(all_data, dId=None ):
     }        
     return response
 
-print(alertsQuantityPerType(requestDatas()))
+print(alertsQuantityPerType(requestDatas("6515cd2bf2295200154f579e")))

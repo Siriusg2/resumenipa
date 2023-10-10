@@ -117,4 +117,4 @@ def count_exits(all_entrances):
     return min_response if len(min_response["detail"])>1 else min_response["detail"][0]
 
 
-print(count_exits(requestDatas('*869310069283953')))
+print(count_exits(requestDatas("6515cd2bf2295200154f579e", '*869310069283953')))
