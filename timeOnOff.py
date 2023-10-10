@@ -3,6 +3,8 @@ import json
 
 
 def time_on_off(all_entrance):
+    if len(all_entrance) == 0:
+        return
     full_response = {
         "total": {
             "on": 0,
