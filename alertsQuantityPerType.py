@@ -23,5 +23,10 @@ def alertsQuantityPerType(all_data, dId=None ):
         "alarmsTypeCount": alarmsTypeCount
     }        
     return response
+all_data = requestDatas("6515cd2bf2295200154f579e")
+response = {}
+device_names_dict = {data["dId"]: data["device_name"] for data in all_data}
+for key, value in device_names_dict.items():
+    response[value] = alertsQuantityPerType(all_data, key)
 
-print(alertsQuantityPerType(requestDatas("6515cd2bf2295200154f579e")))
+print(response)

@@ -41,11 +41,30 @@ def timeInAndOutHome(all_data, dId=None ):
 
     dias_dentro_casa, horas_dentro_casa, minutos_dentro_casa, segundos_dentro_casa = milisegundos_a_dias_horas_minutos_segundos(tiempo_dentro_casa)
     dias_fuera_casa, horas_fuera_casa, minutos_fuera_casa, segundos_fuera_casa = milisegundos_a_dias_horas_minutos_segundos(tiempo_fuera_casa)
+    response = {
+        "en_casa":{
+            "dias": int(dias_dentro_casa),
+            "horas": int(horas_dentro_casa),
+            "minutos": int(minutos_dentro_casa),
+            "segundos": int(segundos_dentro_casa)
+        },
+        "fuera_de_casa":{
+            
+            "dias": int(dias_fuera_casa),
+            "horas": int(horas_fuera_casa),
+            "minutos": int(minutos_fuera_casa),
+            "segundos": int(segundos_fuera_casa)
 
-# Paso 5: Imprime los resultados.
-    print("Tiempo acumulado dentro de casa:", int(dias_dentro_casa), "días,", int(horas_dentro_casa), "horas,", int(minutos_dentro_casa), "minutos,", int(segundos_dentro_casa), "segundos")
-    print("Tiempo acumulado fuera de casa:", int(dias_fuera_casa), "días,", int(horas_fuera_casa), "horas,", int(minutos_fuera_casa), "minutos,", int(segundos_fuera_casa), "segundos")
-    print(f"Total tiempo de prueba: dias:{int(dias_dentro_casa+dias_fuera_casa)}, horas:{int(horas_dentro_casa+horas_fuera_casa)}, minutos:{int(minutos_dentro_casa+minutos_fuera_casa)}, segundos:{int(segundos_dentro_casa+segundos_fuera_casa)}")
-print(timeInAndOutHome(requestDatas("6515cd2bf2295200154f579e")))
+        }
+        }
+    return response
 
 
+
+all_data = requestDatas("6515cd2bf2295200154f579e")
+response = {}
+device_names_dict = {data["dId"]: data["device_name"] for data in all_data}
+for key, value in device_names_dict.items():
+    response[value] = timeInAndOutHome(all_data, key)
+
+print(response)

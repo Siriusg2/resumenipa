@@ -11,10 +11,10 @@ def battery_time(all_data, dId=None ):
     df['time'] = pd.to_datetime(df['time'], unit='ms')
 
 # Calcular la duración de la batería en segundos
-    df['battery_duration'] = df.groupby('dId')['time'].diff().dt.total_seconds()
+    df['battery_duration'] = df.groupby('device_name')['time'].diff().dt.total_seconds()
 
 # Calcular el promedio de la duración de la batería por dispositivo (dId)
-    promedio_por_dispositivo = df.groupby('dId')['battery_duration'].mean()
+    promedio_por_dispositivo = df.groupby('device_name')['battery_duration'].mean()
     # print(promedio_por_dispositivo)
     for dispositivo, promedio in promedio_por_dispositivo.items():
         horas = int(promedio / 60)
