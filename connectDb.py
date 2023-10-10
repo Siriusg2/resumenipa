@@ -42,4 +42,4 @@ def requestDatas(channel_id, dId=None, startDate=None, endDate=None):
        entry["device_name"] = device_names_dict.get(entry["dId"], "Nombre Desconocido")
    
     return result
-print(requestDatas("6515cd2bf2295200154f579e"))
+
