@@ -25,6 +25,6 @@ def requestDatas(channel_id, dId=None, startDate=None, endDate=None):
         result = [item for item in allEntries if  item["time"] <= endDate] 
     else:
         result = allEntries
-
+ 
     return result
 requestDatas("6515cd2bf2295200154f579e")
