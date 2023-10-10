@@ -99,12 +99,13 @@ def is_outside_home(data):
         return False
 
 def format_timedelta(seconds):
-    duration = timedelta(seconds=seconds)
-    days = duration.days
-    seconds = duration.seconds
-    hours, seconds = divmod(seconds, 3600)
-    minutes, seconds = divmod(seconds, 60)
-    return f"{days} días {hours} horas {minutes} minutos {seconds} segundos"
+    # duration = timedelta(seconds=seconds)
+    # days = duration.days
+    # seconds = duration.seconds
+    # hours, seconds = divmod(seconds, 3600)
+    # minutes, seconds = divmod(seconds, 60)
+    # return f"{days} días {hours} horas {minutes} minutos {seconds} segundos"
+    return seconds//3600
 
 
 def timeInAndOutHome(all_data):

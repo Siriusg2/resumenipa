@@ -1,5 +1,6 @@
 from connectDb import requestDatas
 import json
+import pandas as pd
 
 
 def time_on_off(all_entrance):
@@ -56,5 +57,21 @@ def time_on_off(all_entrance):
     return full_response
 
 
-print(time_on_off(requestDatas("6515cd2bf2295200154f579e")))
+# print(time_on_off(requestDatas("6515cd2bf2295200154f579e")))
 # , '*862095056372110'
+
+def convert_data_to_excel(data):
+    # Crear un DataFrame de Pandas a partir del diccionario
+    df = pd.DataFrame.from_dict(data, orient='index')
+
+#   Expandir los diccionarios anidados en columnas separadas
+    df[['on_horas', 'on_minutos', 'on_segundos']] = df['on'].apply(pd.Series)
+    df[['off_horas', 'off_minutos', 'off_segundos']] = df['off'].apply(pd.Series)
+
+# Eliminar las columnas originales de 'on' y 'off'
+    df = df.drop(['on', 'off'], axis=1)
+
+# Exportar el DataFrame a un archivo Excel
+    df.to_excel('excel_reports/time_on_off.xlsx')
+
+convert_data_to_excel(time_on_off(requestDatas("6515cd2bf2295200154f579e")))
