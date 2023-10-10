@@ -2,13 +2,16 @@ from shapely.geometry import Point
 from connectDb import requestDatas
 import pymongo
 import json
+from dotenv import load_dotenv
+import os
 
 def get_geofences_from_db(dId):
-    host = "app.blipconnection.com" 
-    port = 27017  
-    username = "admin"  
-    password = "iotabserver"  
-    database_name = "iotab" 
+    load_dotenv()
+    host = str(os.getenv("DB_HOST")) 
+    port = int(os.getenv("DB_PORT"))   
+    username = str(os.getenv("DB_USERNAME"))  
+    password = str(os.getenv("DB_PASSWORD"))  
+    database_name = str(os.getenv("DB_NAME"))
     client = pymongo.MongoClient(host, port, username=username, password=password)
     db = client[database_name]
     collection = db["devices"]
