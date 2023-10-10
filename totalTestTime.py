@@ -40,4 +40,4 @@ def total_test_time(all_entrances):
     return final_response
 
 
-print(total_test_time(requestDatas("6515cd2bf2295200154f579e", '*8620950561695990')))
+print(total_test_time(requestDatas("6515cd2bf2295200154f579e")))
