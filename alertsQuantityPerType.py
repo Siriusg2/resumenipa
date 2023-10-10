@@ -1,6 +1,7 @@
 from connectDb import requestDatas
 import json
-
+import pandas as pd
+from pandas import json_normalize
 
 def alertsQuantityPerType(all_data, dId=None ):
     if dId != None:
@@ -12,8 +13,6 @@ def alertsQuantityPerType(all_data, dId=None ):
     for entry in allEntries:
         data = json.loads(entry["data"])
         if len(data["alarm_status"]):
-            if"geofence_status" in data["alarm_status"]:
-                print(data["alarm_status"]["geofence_status"])
             for alarm, value in data["alarm_status"].items():
                 if alarm in alarmsTypeCount and value != 0:
                     alarmsTypeCount[alarm] += 1
@@ -26,7 +25,20 @@ def alertsQuantityPerType(all_data, dId=None ):
 all_data = requestDatas("6515cd2bf2295200154f579e")
 response = {}
 device_names_dict = {data["dId"]: data["device_name"] for data in all_data}
-for key, value in device_names_dict.items():
-    response[value] = alertsQuantityPerType(all_data, key)
+results_list = []
 
-print(response)
+for key, value in device_names_dict.items():
+    results_list.append ({"device_name": value, "device_id": key,"data":alertsQuantityPerType(all_data, key)
+})
+# print(results_list[0])
+def create_excel_file(response):
+    df = pd.DataFrame(response)
+
+    df = pd.concat([df.drop(['data'], axis=1), df['data'].apply(pd.Series)], axis=1)
+
+# Aplanar la columna 'alarmsTypeCount'
+    df = pd.concat([df.drop(['alarmsTypeCount'], axis=1), df['alarmsTypeCount'].apply(pd.Series)], axis=1)
+# Exporta el DataFrame a un archivo de Excel
+    excel_file = 'excel_reports/alertsQuantityPerType.xlsx'
+    df.to_excel(excel_file)
+create_excel_file(results_list)
