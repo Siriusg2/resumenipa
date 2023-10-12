@@ -9,7 +9,7 @@ def alertsQuantityPerType(all_data, dId=None ):
     else:
         allEntries = all_data
     count = 0
-    alarmsTypeCount = { 'battery': 0, 'alert_speed': 0, 'alert_fall': 0, 'alert_tilt': 0,  'power_off': 0, 'power_on': 0, 'no_motion': 0, 'alert_sos': 0}
+    alarmsTypeCount = { 'battery': 0, 'alert_speed': 0, 'alert_fall': 0, 'geofences': 0,  'power_off': 0, 'power_on': 0, 'no_motion': 0, 'alert_sos': 0, "SOS_app":0}
     for entry in allEntries:
         data = json.loads(entry["data"])
         if len(data["alarm_status"]):
