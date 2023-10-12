@@ -24,7 +24,7 @@ def calculate_speed(data):
 def format_duration(seconds):
     hours, remainder = divmod(seconds, 3600)
     minutes, seconds = divmod(remainder, 60)
-    return f"{int(hours)}h {int(minutes)}m {int(seconds)}s"
+    return int(minutes)
 
 def walkAverage(all_data):
     df = pd.DataFrame(all_data)
