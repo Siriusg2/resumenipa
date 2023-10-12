@@ -4,52 +4,41 @@ from utils.fromUnixToDatetime import fromUnixToDatetime
 import json
 from utils.diffTimeSeconds import diffTimeSeconds
 
-# def format_duration(minutes):
-#     print(minutes)
-#     hours, remainder = divmod(minutes, 60)
-#     # return f"{int(hours):02d}:{int(remainder):02d}:00"
-#     return hours
-# def battery_time(all_data, dId=None ):
-#    # Crear un DataFrame de Pandas a partir de tus datos
-#     df = pd.DataFrame(all_data)
+def calcular_rendimiento_bateria(device_data):
+    rendimiento = {}
+    prev_time = None
+    prev_battery = None
 
-# # Convertir la columna 'time' a datetime
-#     df['time'] = pd.to_datetime(df['time'], unit='ms')
+    for date, data in device_data.items():
+        time = data['unixinseconds']
+        battery = next(iter(data.values()))
 
-# # Calcular la duración de la batería en segundos
-#     df['battery_duration'] = df.groupby('device_name')['time'].diff().dt.total_seconds()
-# # Calcular el promedio de la duración de la batería por dispositivo (dId)
-#     promedio_por_dispositivo = df.groupby('device_name')['battery_duration'].mean()
-#     promedio_por_dispositivo = promedio_por_dispositivo.apply(format_duration)
-#     promedio_por_dispositivo.to_excel("excel_reports/promedio_bateria.xlsx", index=True)
-    # print(promedio_por_dispositivo)
-    # response = {
+        if prev_time is not None:
+            diferencia_tiempo = time - prev_time
+            diferencia_bateria = prev_battery - battery
+            if diferencia_bateria > 0 and diferencia_tiempo//3600 <24:
+                rendimiento[date] = abs(round(((diferencia_bateria / diferencia_tiempo) * 3600)*24, 1))  # Convertir a unidades por hora
+              # Convertir a unidades por hora
 
-    # }
-    # for dispositivo, promedio in promedio_por_dispositivo.items():
-    #     horas = int(promedio / 60)
-    #     minutos = int(promedio % 60)
-    #     segundos = int((promedio % 1) * 60)
-    #     response[dispositivo] = {
-    #         "horas": horas,
-    #         "minutos": minutos,
-    #         "segundos": segundos
-    #     }
-    
-    # return response
-# Imprimir el resultado
+        prev_time = time
+        prev_battery = battery
+
+    return rendimiento
+
 
 def battery_time(all_data, dId=None):
     # We create the data structure to dataframe
     sorted_data = sorted(all_data, key=lambda x: x["time"])
 
     data_structure = {}
+
     for entry in  sorted_data:
         if len(entry["data"]):
             data = json.loads(entry["data"])
             time = fromUnixToDatetime(entry["time"]).get("time")
             date=fromUnixToDatetime(entry["time"]).get("date")
             name = entry["device_name"]
+         
             if "battery" in data["status"]:
                 battery_level = data["status"]["battery"]
                 id=entry["dId"]
@@ -64,32 +53,33 @@ def battery_time(all_data, dId=None):
                         if time not in data_structure[id]["data"][date]:
                             data_structure[id]["data"][date][time] = battery_level
                             data_structure[id]["data"][date]["unixinseconds"] = int(entry["time"])//1000
-  
-    data_structure = list(data_structure.values())
     result = {}
-    index = 0
-    total_day = 0
-    total = 0
-    while len(data_structure)> index:
-        index_per_device = 0
-        index_per_day = 0
-        for day, data_day in data_structure[index]["data"].items():
-            index_per_device+=1
-            for i, (time, battery) in enumerate(data_day.items()):
-                index_per_day+=1
-                total_day+=battery
-            total_day = total_day / index_per_day
-            total+=total_day
-        total = total / index_per_device
-        result[data_structure[index]["name"]] = {
-       "total_avg":int(fromUnixToDatetime(total)),
-       "day_avg":int(fromUnixToDatetime(total_day))
+    for device_id, device_info in data_structure.items():
+        device_name = device_info['name']
+        device_data = device_info['data']
+        rendimiento_bateria = calcular_rendimiento_bateria(device_data)
+        if device_name not in result:
+            result[device_name] = {
+            "gasto_bateria_dia": rendimiento_bateria
             }
+        else:
+            result[device_name]["rendimiento_bateria_dia"] = rendimiento_bateria
 
-        index += 1
-    print(result)
+    promedio_por_dispositivo = {}
+
+    for dispositivo, datos in result.items():
+        promedio = round(100/round(sum(datos["gasto_bateria_dia"].values()) / len(datos["gasto_bateria_dia"]),1),1)
+        promedio_por_dispositivo[dispositivo] = promedio  
+    
+    #convertir resultado final en dataframe
+    df = pd.DataFrame(list(promedio_por_dispositivo.items()), columns=['Nombre', 'Dias'])
+    df.set_index('Nombre', inplace=True)
+    df.to_excel('excel_reports/promedio_bateria.xlsx')
+    return promedio_por_dispositivo
 
 
   
-print(battery_time(requestDatas("6515cd2bf2295200154f579e")))
+data_structure = battery_time(requestDatas("6515cd2bf2295200154f579e"))
+
+
 
