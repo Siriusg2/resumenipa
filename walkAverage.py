@@ -67,8 +67,9 @@ def walkAverage(all_data):
     result = pd.merge(result, average_outside_home_duration, on=['device_name', 'dId'])
 
     excel_file = 'excel_reports/walkAverageAll.xlsx'
+    result.drop(columns=['time_range'], inplace=True)
     result.to_excel(excel_file, index=False)
-    
+    print(result)
     return result
 
 all_data = requestDatas("6515cd2bf2295200154f579e")
