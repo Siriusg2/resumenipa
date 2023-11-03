@@ -1,6 +1,7 @@
 
-const datasModel = require('../models/datasModel');
-const usersModel = require('../models/usersModel')
+const usersModel = require('../models/usersModel');
+const whatsappModel = require('../models/whatsappModel')
+const devicesModel = require('../models/devicesModel')
 
 /*
 *********************** PIE CHART ***********************
@@ -51,12 +52,27 @@ const usersModel = require('../models/usersModel')
 ****************************************************
 
 */
+
 const keyWords = ["velocidad", "caída", "panico", "apagado", "encendido", "inactividad", "baja", "activado el modo SOS"]
 
-const alarmsCount = (allData) => {
-  const filteredData = allData.filter(document => Object.keys(document.data).length ? document : undefined)
+const getAllDataWhatsapp = async (channelId, startDate, endDate) => {
+  const usersIds = (await usersModel.find({ channel: channelId })).map(user => user._id)
+  let devicesContacts = (await devicesModel.find({ userId: { $in: usersIds } })).map(device => {
+    let contactsParsed = JSON.parse(device.contacts).map(contact => {
 
-  return allData[0]
+      return contact.number
+
+
+
+    })
+    return contactsParsed[0]
+  })
+
+  const whatsappMessages = await whatsappModel.find({ number: { $in: devicesContacts } })
+
+  return whatsappMessages
+
+
 }
 
-module.exports = alarmsCount 
+module.exports = getAllDataWhatsapp 
