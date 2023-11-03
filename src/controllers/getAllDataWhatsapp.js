@@ -2,7 +2,7 @@
 const usersModel = require('../models/usersModel');
 const whatsappModel = require('../models/whatsappModel')
 const devicesModel = require('../models/devicesModel')
-
+const stringDateToUnixParser = require('../utils/stringDateToUnixParser')
 /*
 *********************** PIE CHART ***********************
 
@@ -53,25 +53,44 @@ const devicesModel = require('../models/devicesModel')
 
 */
 
-const keyWords = ["velocidad", "caída", "panico", "apagado", "encendido", "inactividad", "baja", "activado el modo SOS"]
+
 
 const getAllDataWhatsapp = async (channelId, startDate, endDate) => {
+  startDate = stringDateToUnixParser(startDate)
+  endDate = stringDateToUnixParser(endDate)
+
+  const devicesNames = []
   const usersIds = (await usersModel.find({ channel: channelId })).map(user => user._id)
   let devicesContacts = (await devicesModel.find({ userId: { $in: usersIds } })).map(device => {
+    !devicesNames.find(rastreador => device.name == rastreador.name) ? devicesNames.push({ name: device.name, contactsQuantity: JSON.parse(device.contacts).length }) : null
     let contactsParsed = JSON.parse(device.contacts).map(contact => {
-
       return contact.number
-
-
-
     })
-    return contactsParsed[0]
+    return contactsParsed
+  })
+  devicesContacts = devicesContacts.flat()
+  let whatsappMessages = await whatsappModel.find({ number: { $in: devicesContacts } })
+  whatsappMessages.forEach(contact => {
+    if (contact.messages.length > 0) {
+
+      contact.messages = contact.messages.filter(message => {
+        if (message.timestamp.getTime() >= startDate && message.timestamp.getTime() <= endDate) {
+          return message
+        }
+
+
+
+
+      })
+
+    }
   })
 
-  const whatsappMessages = await whatsappModel.find({ number: { $in: devicesContacts } })
 
-  return whatsappMessages
-
+  return {
+    devicesNames,
+    whatsappMessages
+  }
 
 }
 
