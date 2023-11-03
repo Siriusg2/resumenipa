@@ -1,22 +1,27 @@
-const { MongoClient } = require('mongodb');
 
+const mongoose = require('mongoose');
 // URL de conexión a tu base de datos MongoDB
-const url = 'mongodb://admin:iotabserver@app.blipconnection.com:27017/'; // 
+const url = 'mongodb://admin:iotabserver@app.blipconnection.com:27017/'
 // Nombre de la base de datos
-const dbName = 'iotab'; // Cambia por el nombre de tu base de datos
 
-// Crea una instancia del cliente
-const client = new MongoClient(url, { useUnifiedTopology: true });
+
+
 
 // Conéctate a la base de datos
-async function connect() {
+async function connectDb() {
+
     try {
-        await client.connect();
-        console.log('Conexión exitosa a la base de datos');
+
+        mongoose.connect(url, { dbName: 'iotab' });
+
+        mongoose.connection.on('connected', () => {
+            console.log('Conexión a la base de datos establecida');
+        });
+
     } catch (error) {
-        console.error('Error de conexión a la base de datos:', error);
+        console.error(error);
     }
 }
 
 // Llama a la función para conectarte a la base de datos
-module.exports = { connect, client }
+module.exports = { connectDb }
