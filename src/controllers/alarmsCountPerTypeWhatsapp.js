@@ -50,7 +50,7 @@
 ****************************************************
 
 */
-const keyWords = ["superada", "caída", "panico", "apagado", "encendido", "inactividad", "baja", "activado", "saliendo"]
+const keyWords = [{ tag: "speedLimit", keyword: "superada" }, { tag: "fall", keyword: "caida" }, { tag: "panicButton", keyword: "panico" }, { tag: "powerOff", keyword: "apagado" }, { tag: "PowerOn", keyword: "encendido" }, { tag: "noMovement", keyword: "inactividad" }, { tag: "lowBattery", keyword: "baja" }, { tag: "sosMode", keyword: "activado" }, { tag: "geofenceOut", keyword: "saliendo" }]
 
 const alarmsCountWhatsapp = (whatsAppData) => {
   const {
@@ -64,22 +64,26 @@ const alarmsCountWhatsapp = (whatsAppData) => {
     let devicesStringNames = devicesNames.map(device => device.name)
     contact.messages.forEach(element => {
       if (element.message) {
-        let alarm = keyWords.find(alarm => element.message.toLowerCase().includes(alarm.toLowerCase()));
+        let alarm = keyWords.find(alarm => element.message.toLowerCase().includes(alarm.keyword.toLowerCase()));
         let nameOfDevice = devicesStringNames.find(deviceName => element.message.toLowerCase().includes(deviceName.toLowerCase()));
-        if (alarm && nameOfDevice) {
-          alarm = alarm.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+        if (alarm && Object.keys(alarm).length && nameOfDevice) {
+          alarm = alarm.tag
           nameOfDevice = nameOfDevice.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
           if (countStructure[nameOfDevice]) {
             if (countStructure[nameOfDevice][alarm]) {
               countStructure[nameOfDevice][alarm] += 1
             } else {
               countStructure[nameOfDevice][alarm] = 1
+
             }
           } else {
             countStructure[nameOfDevice] = {
-              [alarm]: 1 //alarm
+              [alarm]: 1,
+
+
             }
           }
+
 
         }
 
@@ -91,11 +95,31 @@ const alarmsCountWhatsapp = (whatsAppData) => {
     for (let alarm in countStructure[root]) {
       const valueToSplit = devicesNames.find(device => device.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "") === root).contactsQuantity
 
-      countStructure[root][alarm] = Math.round(countStructure[root][alarm] / valueToSplit)
+      countStructure[root][alarm] = Math.ceil(countStructure[root][alarm] / valueToSplit)
+
+
 
     }
   }
-  console.log(countStructure);
+
+  const totalcountStructure = {};
+
+  // Recorre cada dispositivo en el objeto
+  for (const dispositivo in countStructure) {
+    if (countStructure.hasOwnProperty(dispositivo)) {
+      const alarmas = countStructure[dispositivo];
+      let totalAlarmas = 0;
+
+      // Recorre cada tipo de alarma para el dispositivo
+      for (const tipoAlarma in alarmas) {
+        if (alarmas.hasOwnProperty(tipoAlarma)) {
+          totalAlarmas += alarmas[tipoAlarma];
+        }
+      }
+
+      totalcountStructure[dispositivo] = totalAlarmas;
+    }
+  }
 
 }
 

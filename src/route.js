@@ -1,6 +1,6 @@
 const router = require('express').Router()
 const alarmsCount = require('./controllers/alarmsCount')
-const alarmsCountWhatsapp = require('./controllers/alarmsCountWhatsapp')
+const alarmsCountWhatsapp = require('./controllers/alarmsCountPerTypeWhatsapp')
 const getAllData = require('./controllers/getAllData')
 const getAllDataWhatsapp = require('./controllers/getAllDataWhatsapp')
 
