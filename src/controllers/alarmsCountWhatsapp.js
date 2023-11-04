@@ -53,74 +53,70 @@
 const keyWords = [{ tag: "speedLimit", keyword: "superada" }, { tag: "fall", keyword: "caida" }, { tag: "panicButton", keyword: "panico" }, { tag: "powerOff", keyword: "apagado" }, { tag: "PowerOn", keyword: "encendido" }, { tag: "noMovement", keyword: "inactividad" }, { tag: "lowBattery", keyword: "baja" }, { tag: "sosMode", keyword: "activado" }, { tag: "geofenceOut", keyword: "saliendo" }]
 
 const alarmsCountWhatsapp = (whatsAppData) => {
-  const {
-    devicesNames,
-    whatsappMessages
-  } = whatsAppData
-  let countStructure = {}
+  const { devicesNames, whatsappMessages } = whatsAppData;
+  let perTypeCountStructure = {};
 
+  whatsappMessages.forEach(({ messages }) => {
+    const devicesStringNames = devicesNames.map(({ name }) => name);
 
-  whatsappMessages.forEach(contact => {
-    let devicesStringNames = devicesNames.map(device => device.name)
-    contact.messages.forEach(element => {
-      if (element.message) {
-        let alarm = keyWords.find(alarm => element.message.toLowerCase().includes(alarm.keyword.toLowerCase()));
-        let nameOfDevice = devicesStringNames.find(deviceName => element.message.toLowerCase().includes(deviceName.toLowerCase()));
-        if (alarm && Object.keys(alarm).length && nameOfDevice) {
-          alarm = alarm.tag
-          nameOfDevice = nameOfDevice.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-          if (countStructure[nameOfDevice]) {
-            if (countStructure[nameOfDevice][alarm]) {
-              countStructure[nameOfDevice][alarm] += 1
-            } else {
-              countStructure[nameOfDevice][alarm] = 1
+    messages.forEach(({ message }) => {
+      if (message) {
+        const alarm = keyWords.find(({ keyword }) =>
+          message.toLowerCase().includes(keyword.toLowerCase())
+        );
+        const nameOfDevice = devicesStringNames.find((deviceName) =>
+          message.toLowerCase().includes(deviceName.toLowerCase())
+        );
 
-            }
-          } else {
-            countStructure[nameOfDevice] = {
-              [alarm]: 1,
+        if (alarm && nameOfDevice) {
+          const normalizedName = nameOfDevice.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+          const { tag: alarmTag } = alarm;
 
-
-            }
+          if (!perTypeCountStructure[normalizedName]) {
+            perTypeCountStructure[normalizedName] = {};
           }
 
+          if (!perTypeCountStructure[normalizedName][alarmTag]) {
+            perTypeCountStructure[normalizedName][alarmTag] = 0;
+          }
 
+          perTypeCountStructure[normalizedName][alarmTag]++;
         }
-
       }
-    })
-  })
+    });
+  });
 
-  for (let root in countStructure) {
-    for (let alarm in countStructure[root]) {
-      const valueToSplit = devicesNames.find(device => device.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "") === root).contactsQuantity
+  for (const root in perTypeCountStructure) {
+    const valueToSplit = devicesNames.find(({ name }) =>
+      name.normalize("NFD").replace(/[\u0300-\u036f]/g, "") === root
+    ).contactsQuantity;
 
-      countStructure[root][alarm] = Math.ceil(countStructure[root][alarm] / valueToSplit)
-
-
-
+    for (const alarm in perTypeCountStructure[root]) {
+      perTypeCountStructure[root][alarm] = Math.ceil(perTypeCountStructure[root][alarm] / valueToSplit);
     }
   }
 
-  const totalcountStructure = {};
+  const totalPerDeviceCount = {};
 
-  // Recorre cada dispositivo en el objeto
-  for (const dispositivo in countStructure) {
-    if (countStructure.hasOwnProperty(dispositivo)) {
-      const alarmas = countStructure[dispositivo];
+  for (const dispositivo in perTypeCountStructure) {
+    if (perTypeCountStructure.hasOwnProperty(dispositivo)) {
+      const alarmas = perTypeCountStructure[dispositivo];
       let totalAlarmas = 0;
 
-      // Recorre cada tipo de alarma para el dispositivo
       for (const tipoAlarma in alarmas) {
         if (alarmas.hasOwnProperty(tipoAlarma)) {
           totalAlarmas += alarmas[tipoAlarma];
         }
       }
 
-      totalcountStructure[dispositivo] = totalAlarmas;
+      totalPerDeviceCount[dispositivo] = totalAlarmas;
     }
   }
-
-}
+  console.log(totalPerDeviceCount);
+  console.log(perTypeCountStructure);
+  return {
+    perTypeCountStructure, totalPerDeviceCount
+  }
+};
 
 module.exports = alarmsCountWhatsapp 
