@@ -1,4 +1,9 @@
 const generarColoresAleatorios = require('../utils/generateRandomHexColors')
+const { basicOptions, barChartOptionsGradient, pieChartOptions } = require('../utils/graphOptions')
+
+
+
+
 const keyWords = [{ tag: "speedLimit", keyword: "superada" }, { tag: "fall", keyword: "caida" }, { tag: "panicButton", keyword: "panico" }, { tag: "powerOff", keyword: "apagado" }, { tag: "PowerOn", keyword: "encendido" }, { tag: "noMovement", keyword: "inactividad" }, { tag: "lowBattery", keyword: "baja" }, { tag: "sosMode", keyword: "activado" }, { tag: "geofenceOut", keyword: "saliendo" }]
 
 const alarmsCountWhatsapp = (whatsAppData) => {
@@ -95,7 +100,7 @@ const alarmsCountWhatsapp = (whatsAppData) => {
         }
       ]
     },
-    // extraOptions: chartConfigs.pieChartOptions
+    extraOptions: pieChartOptions
   }
   // console.log(JSON.stringify(totalAlarmsPerDevicePieChartStrucucture));
 
@@ -127,13 +132,13 @@ const alarmsCountWhatsapp = (whatsAppData) => {
           }
 
         }
-        let color = generarColoresAleatorios(1)
+        let color = generarColoresAleatorios(arrayDeObjetos.length)[0]
         return {
           label: device.deviceName,
           fill: true,
-          backgroundColor: color[0],
-          hoverBackgroundColor: color[0],
-          borderColor: color[0],
+          backgroundColor: color,
+          hoverBackgroundColor: color,
+          borderColor: color,
           borderWidth: 2,
           borderDash: [],
           borderDashOffset: 0.0,
@@ -143,12 +148,13 @@ const alarmsCountWhatsapp = (whatsAppData) => {
 
 
     },
-    // extraOptions: chartConfigs.barChartOptionsGradient
+    extraOptions: barChartOptionsGradient
 
   }
 
 
   //****************************************************************!/
+  console.log(JSON.stringify(alarmsPerTypePerDeviceBarChartStrucucture));
   return {
     totalAlarms: totalAlarmsPerDevicePieChartStrucucture,
     alarmTypes: alarmsPerTypePerDeviceBarChartStrucucture
