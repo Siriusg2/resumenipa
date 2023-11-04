@@ -46,29 +46,46 @@ const alarmsCountWhatsapp = (whatsAppData) => {
 
 
 
-
   //SE PROMEDIA LA CANTIDAD DE MENSAJES ENTRE LOS NUMEROS DE CONTACTO PARA OBTENER EL VALOR REAL DE
   //LAS ALARMAS
+
   for (const root in perTypeCountStructure) {
-    const valueToSplit = devicesNames.find(({ name }) =>
+    let valueToSplit = devicesNames.find(({ name }) =>
       name.normalize("NFD").replace(/[\u0300-\u036f]/g, "") === root
     ).contactsQuantity;
 
+    //aqui añadimos las propiedades no encontradas para cada dispositivo
+    //de esta forma los datos tienen consistencia para la configuracion de los graficos
+    const properties = keyWords.map(({ tag }) => tag);
+
+
+    for (const property of properties) {
+      if (!perTypeCountStructure[root].hasOwnProperty(property)) {
+        perTypeCountStructure[root][property] = 0;
+      }
+    }
+
     for (const alarm in perTypeCountStructure[root]) {
-      perTypeCountStructure[root][alarm] = Math.ceil(perTypeCountStructure[root][alarm] / valueToSplit);
+      if (alarm === "geofenceOut") {
+        perTypeCountStructure[root][alarm] = Math.ceil(perTypeCountStructure[root][alarm] / (valueToSplit + 1));
+      } else {
+        perTypeCountStructure[root][alarm] = Math.ceil(perTypeCountStructure[root][alarm] / valueToSplit);
+      }
     }
   }
+
+
   ///////////////////////////////////////////////////////////////////
 
   /*
   
   
   
-  
-  
-  CONVERTIMOS LA ESTRUCTURA DE OBJETOS ANINADOS A UN ARRAY DE OBJETOS Y TOTALIZAMOS LAS ALARMAS
-  
-  */
+ 
+ 
+CONVERTIMOS LA ESTRUCTURA DE OBJETOS ANINADOS A UN ARRAY DE OBJETOS Y TOTALIZAMOS LAS ALARMAS
+ 
+*/
   const arrayDeObjetos = [];
 
   for (const dispositivo in perTypeCountStructure) {
@@ -85,7 +102,7 @@ const alarmsCountWhatsapp = (whatsAppData) => {
 
 
 
-  //! IMPORTANTE, ESTA ES LA ESTRUCTURA QUE DEBE TENER LA DATA PARA EL GRAFICO DE TORTA DE TOTAL DE ALARMAS POR DISPOSITIVO* LAS PARTES COMENTADAS SON PARA QUE NO ROMPA EL CODIGO ACA, PQ SON CONFIFURACIONES DE LOS GRAFICOS QUE ESTAN EN EL FRONT//
+  //! IMPORTANTE, ESTA ES LA ESTRUCTURA QUE DEBE TENER LA DATA PARA EL GRAFICO DE TORTA DE TOTAL DE ALARMAS POR DISPOSITIVO* 
   let totalAlarmsPerDevicePieChartStrucucture = {
     chartData: {
       labels: arrayDeObjetos.map(({ deviceName }) => deviceName),
@@ -107,31 +124,35 @@ const alarmsCountWhatsapp = (whatsAppData) => {
 
   //****************************************************************!/
 
-  //! IMPORTANTE, ESTA ES LA ESTRUCTURA QUE DEBE TENER LA DATA PARA EL GRAFICO DE BARRAS DE TIPOS DE ALARMAS POR DISPOSITIVO* LAS PARTES COMENTADAS SON PARA QUE NO ROMPA EL CODIGO ACA, PQ SON CONFIFURACIONES DE LOS GRAFICOS QUE ESTAN EN EL FRONT/
-  let alarmsName = []
-  arrayDeObjetos.map((device) => {
+  //! IMPORTANTE, ESTA ES LA ESTRUCTURA QUE DEBE TENER LA DATA PARA EL GRAFICO DE BARRAS DE TIPOS DE ALARMAS POR DISPOSITIVO* 
 
-    for (const alarm in device) {
-      if (alarm !== "deviceName" && alarm !== "total" && !alarmsName.includes(alarm)) {
+  let dataToStructure = arrayDeObjetos.map(device => {
+    let result = {
+      deviceName: device.deviceName,
+      count: [
+        { tag: "powerOff", value: device.powerOff },
+        { tag: "powerOn", value: device.powerOn },
+        { tag: "geofenceOut", value: device.geofenceOut },
+        { tag: "panicButton", value: device.panicButton },
+        { tag: "fall", value: device.fall },
+        { tag: "speedLimit", value: device.speedLimit },
+        { tag: "noMovement", value: device.noMovement },
+        { tag: "lowBattery", value: device.lowBattery },
+        { tag: "sosMode", value: device.sosMode }
+      ]
 
-        alarmsName.push(alarm)
-      }
     }
-
+    return result
   })
+
+
+
   let alarmsPerTypePerDeviceBarChartStrucucture = {
 
     chartData: {
-      labels: alarmsName,
-      datasets: arrayDeObjetos.map((device) => {
-        let filteredData = []
-        for (const alarm in device) {
-          if (alarm !== "deviceName" && alarm !== "total") {
+      labels: dataToStructure[0].count.map(({ tag }) => tag),
+      datasets: dataToStructure.map((device) => {
 
-            filteredData.push({ alarm, value: device[alarm] })
-          }
-
-        }
         let color = generarColoresAleatorios(arrayDeObjetos.length)[0]
         return {
           label: device.deviceName,
@@ -142,7 +163,7 @@ const alarmsCountWhatsapp = (whatsAppData) => {
           borderWidth: 2,
           borderDash: [],
           borderDashOffset: 0.0,
-          data: filteredData.map(({ value }) => value)
+          data: device.count.map(({ value }) => value)
         }
       }),
 
