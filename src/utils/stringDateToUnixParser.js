@@ -1,7 +1,6 @@
 const stringDateToUnixParser = (date) => {
 
 
-
     date = date.split('/');
     if (date.length === 3) {
         const day = parseInt(date[0], 10);
