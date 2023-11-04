@@ -1,61 +1,13 @@
-
-
-
-/*
-*********************** PIE CHART ***********************
-
-    pieChart2: {
-        chartData: {
-          labels: [1, 2, 3],
-          datasets: [
-            {
-              label: 'Emails',
-              pointRadius: 0,
-              pointHoverRadius: 0,
-              backgroundColor: ['#ff8779', '#2a84e9', '#e2e2e2'],
-              borderWidth: 0,
-              data: [60, 40, 20]
-            }
-          ]
-        },
-        extraOptions: chartConfigs.pieChartOptions
-      }
-
-*************************************************************
-
-
-
-*******************BAR CHART *****************************
-
-{
-        chartData: {
-          labels: ['JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'],
-          datasets: [
-            {
-              label: 'Data',
-              fill: true,
-              borderColor: config.colors.danger,
-              borderWidth: 2,
-              borderDash: [],
-              borderDashOffset: 0.0,
-              data: [80, 100, 70, 80, 120, 80]
-            }
-          ]
-        },
-        extraOptions: chartConfigs.barChartOptionsGradient,
-        gradientColors: config.colors.purpleGradient,
-        gradientStops: [1, 0]
-      }
-
-****************************************************
-
-*/
+const generarColoresAleatorios = require('../utils/generateRandomHexColors')
 const keyWords = [{ tag: "speedLimit", keyword: "superada" }, { tag: "fall", keyword: "caida" }, { tag: "panicButton", keyword: "panico" }, { tag: "powerOff", keyword: "apagado" }, { tag: "PowerOn", keyword: "encendido" }, { tag: "noMovement", keyword: "inactividad" }, { tag: "lowBattery", keyword: "baja" }, { tag: "sosMode", keyword: "activado" }, { tag: "geofenceOut", keyword: "saliendo" }]
 
 const alarmsCountWhatsapp = (whatsAppData) => {
+  /* ITERAMOS EN LA DATA DE LA BASE DATOS PARA ENCONTRAR LAS ALARMAS */
+
+
+
   const { devicesNames, whatsappMessages } = whatsAppData;
   let perTypeCountStructure = {};
-
   whatsappMessages.forEach(({ messages }) => {
     const devicesStringNames = devicesNames.map(({ name }) => name);
 
@@ -85,7 +37,13 @@ const alarmsCountWhatsapp = (whatsAppData) => {
       }
     });
   });
+  /*************************************************************************************/
 
+
+
+
+  //SE PROMEDIA LA CANTIDAD DE MENSAJES ENTRE LOS NUMEROS DE CONTACTO PARA OBTENER EL VALOR REAL DE
+  //LAS ALARMAS
   for (const root in perTypeCountStructure) {
     const valueToSplit = devicesNames.find(({ name }) =>
       name.normalize("NFD").replace(/[\u0300-\u036f]/g, "") === root
@@ -95,27 +53,105 @@ const alarmsCountWhatsapp = (whatsAppData) => {
       perTypeCountStructure[root][alarm] = Math.ceil(perTypeCountStructure[root][alarm] / valueToSplit);
     }
   }
+  ///////////////////////////////////////////////////////////////////
 
-  const totalPerDeviceCount = {};
+  /*
+  
+  
+  
+  
+  
+  CONVERTIMOS LA ESTRUCTURA DE OBJETOS ANINADOS A UN ARRAY DE OBJETOS Y TOTALIZAMOS LAS ALARMAS
+  
+  */
+  const arrayDeObjetos = [];
 
   for (const dispositivo in perTypeCountStructure) {
     if (perTypeCountStructure.hasOwnProperty(dispositivo)) {
+      let values = Object.values(perTypeCountStructure[dispositivo]);
+      let total = values.reduce((a, b) => a + b, 0);
       const alarmas = perTypeCountStructure[dispositivo];
-      let totalAlarmas = 0;
-
-      for (const tipoAlarma in alarmas) {
-        if (alarmas.hasOwnProperty(tipoAlarma)) {
-          totalAlarmas += alarmas[tipoAlarma];
-        }
-      }
-
-      totalPerDeviceCount[dispositivo] = totalAlarmas;
+      const objeto = { deviceName: dispositivo, ...alarmas, total };
+      arrayDeObjetos.push(objeto);
     }
   }
-  console.log(totalPerDeviceCount);
-  console.log(perTypeCountStructure);
+
+  /**************************************************************************************** */
+
+
+
+  //! IMPORTANTE, ESTA ES LA ESTRUCTURA QUE DEBE TENER LA DATA PARA EL GRAFICO DE TORTA DE TOTAL DE ALARMAS POR DISPOSITIVO* LAS PARTES COMENTADAS SON PARA QUE NO ROMPA EL CODIGO ACA, PQ SON CONFIFURACIONES DE LOS GRAFICOS QUE ESTAN EN EL FRONT//
+  let totalAlarmsPerDevicePieChartStrucucture = {
+    chartData: {
+      labels: arrayDeObjetos.map(({ deviceName }) => deviceName),
+      datasets: [
+        {
+          label: 'Alarmas por dispositivo',
+          pointRadius: 0,
+          pointHoverRadius: 0,
+          backgroundColor: generarColoresAleatorios(arrayDeObjetos.length),
+          borderWidth: 0,
+          data: arrayDeObjetos.map(({ total }) => total)
+        }
+      ]
+    },
+    // extraOptions: chartConfigs.pieChartOptions
+  }
+  // console.log(JSON.stringify(totalAlarmsPerDevicePieChartStrucucture));
+
+
+  //****************************************************************!/
+
+  //! IMPORTANTE, ESTA ES LA ESTRUCTURA QUE DEBE TENER LA DATA PARA EL GRAFICO DE BARRAS DE TIPOS DE ALARMAS POR DISPOSITIVO* LAS PARTES COMENTADAS SON PARA QUE NO ROMPA EL CODIGO ACA, PQ SON CONFIFURACIONES DE LOS GRAFICOS QUE ESTAN EN EL FRONT/
+  let alarmsName = []
+  arrayDeObjetos.map((device) => {
+
+    for (const alarm in device) {
+      if (alarm !== "deviceName" && alarm !== "total" && !alarmsName.includes(alarm)) {
+
+        alarmsName.push(alarm)
+      }
+    }
+
+  })
+  let alarmsPerTypePerDeviceBarChartStrucucture = {
+
+    chartData: {
+      labels: alarmsName,
+      datasets: arrayDeObjetos.map((device) => {
+        let filteredData = []
+        for (const alarm in device) {
+          if (alarm !== "deviceName" && alarm !== "total") {
+
+            filteredData.push({ alarm, value: device[alarm] })
+          }
+
+        }
+        let color = generarColoresAleatorios(1)
+        return {
+          label: device.deviceName,
+          fill: true,
+          backgroundColor: color[0],
+          hoverBackgroundColor: color[0],
+          borderColor: color[0],
+          borderWidth: 2,
+          borderDash: [],
+          borderDashOffset: 0.0,
+          data: filteredData.map(({ value }) => value)
+        }
+      }),
+
+
+    },
+    // extraOptions: chartConfigs.barChartOptionsGradient
+
+  }
+
+
+  //****************************************************************!/
   return {
-    perTypeCountStructure, totalPerDeviceCount
+    totalAlarms: totalAlarmsPerDevicePieChartStrucucture,
+    alarmTypes: alarmsPerTypePerDeviceBarChartStrucucture
   }
 };
 
