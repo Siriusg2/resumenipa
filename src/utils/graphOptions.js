@@ -122,7 +122,7 @@ let barChartOptionsGradient = {
                     zeroLineColor: "transparent",
                 },
                 ticks: {
-                    suggestedMin: 5,
+                    suggestedMin: 1,
                     suggestedMax: 10,
                     padding: 20,
                     fontColor: "#9e9e9e",

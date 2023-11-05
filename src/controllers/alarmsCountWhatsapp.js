@@ -4,7 +4,7 @@ const { basicOptions, barChartOptionsGradient, pieChartOptions } = require('../u
 
 
 
-const keyWords = [{ tag: "speedLimit", keyword: "superada" }, { tag: "fall", keyword: "caida" }, { tag: "panicButton", keyword: "panico" }, { tag: "powerOff", keyword: "apagado" }, { tag: "PowerOn", keyword: "encendido" }, { tag: "noMovement", keyword: "inactividad" }, { tag: "lowBattery", keyword: "baja" }, { tag: "sosMode", keyword: "activado" }, { tag: "geofenceOut", keyword: "saliendo" }]
+const keyWords = [{ tag: "speedLimit", keyword: "superada", chartTag: "Limite de velocidad" }, { tag: "fall", keyword: "caida", chartTag: "Caida" }, { tag: "panicButton", keyword: "panico", chartTag: "Botón de panico" }, { tag: "powerOff", keyword: "apagado", chartTag: "Dispositivo apagado" }, { tag: "PowerOn", keyword: "encendido", chartTag: "Dispositivo encendido" }, { tag: "noMovement", keyword: "inactividad", chartTag: "Inactividad" }, { tag: "lowBattery", keyword: "baja", chartTag: "Bateria baja" }, { tag: "sosMode", keyword: "activado", chartTag: "Modo SOS" }, { tag: "geofenceOut", keyword: "saliendo", chartTag: "Salida geocerca" }]
 
 const alarmsCountWhatsapp = (whatsAppData) => {
   /* ITERAMOS EN LA DATA DE LA BASE DATOS PARA ENCONTRAR LAS ALARMAS */
@@ -127,18 +127,19 @@ CONVERTIMOS LA ESTRUCTURA DE OBJETOS ANINADOS A UN ARRAY DE OBJETOS Y TOTALIZAMO
   //! IMPORTANTE, ESTA ES LA ESTRUCTURA QUE DEBE TENER LA DATA PARA EL GRAFICO DE BARRAS DE TIPOS DE ALARMAS POR DISPOSITIVO* 
 
   let dataToStructure = arrayDeObjetos.map(device => {
+
     let result = {
       deviceName: device.deviceName,
       count: [
-        { tag: "powerOff", value: device.powerOff },
-        { tag: "powerOn", value: device.powerOn },
-        { tag: "geofenceOut", value: device.geofenceOut },
-        { tag: "panicButton", value: device.panicButton },
-        { tag: "fall", value: device.fall },
-        { tag: "speedLimit", value: device.speedLimit },
-        { tag: "noMovement", value: device.noMovement },
-        { tag: "lowBattery", value: device.lowBattery },
-        { tag: "sosMode", value: device.sosMode }
+        { tag: "Dispositivo apagado", value: device.powerOff },
+        { tag: "Dispositivo encencido", value: device.powerOn },
+        { tag: "Salida geocerca", value: device.geofenceOut },
+        { tag: "Boton de panico", value: device.panicButton },
+        { tag: "Caida", value: device.fall },
+        { tag: "Limite de velocidad", value: device.speedLimit },
+        { tag: "Inactvidad", value: device.noMovement },
+        { tag: "Bateria Baja", value: device.lowBattery },
+        { tag: "Modo SOS", value: device.sosMode }
       ]
 
     }
