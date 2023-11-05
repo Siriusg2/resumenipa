@@ -20,8 +20,8 @@ router.get('/charts-report', async (req, res) => {
 
 
     let result = {
-        // alarms: alarmsCountWhatsapp(allDataWhatsapp),
-        distances: await traveledDistances(allData),
+        alarms: alarmsCountWhatsapp(allDataWhatsapp),
+        // distances: await traveledDistances(allData),
     }
 
     return res.status(200).send(result)

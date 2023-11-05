@@ -1,4 +1,4 @@
-const generarColoresAleatorios = require('../utils/generateRandomHexColors')
+const generateRandomHexColors = require('../utils/generateRandomHexColors')
 const { basicOptions, barChartOptionsGradient, pieChartOptions } = require('../utils/graphOptions')
 
 
@@ -114,17 +114,20 @@ CONVERTIMOS LA ESTRUCTURA DE OBJETOS ANINADOS A UN ARRAY DE OBJETOS Y TOTALIZAMO
       labels: arrayDeObjetos.map(({ deviceName }) => deviceName),
       datasets: [
         {
-          label: 'Alarmas por dispositivo',
-          pointRadius: 0,
-          pointHoverRadius: 0,
-          backgroundColor: generarColoresAleatorios(arrayDeObjetos.length),
-          borderWidth: 0,
-          data: arrayDeObjetos.map(({ total }) => total)
-        }
-      ]
+          label: 'Distancia total recorrida',
+          fill: true,
+          borderColor: generateRandomHexColors(1)[0],
+          borderWidth: 2,
+          borderDash: [],
+          borderDashOffset: 0.0,
+          data: arrayDeObjetos.map(({ total }) => total),
+        },
+      ],
     },
-    extraOptions: pieChartOptions
-  }
+    extraOptions: barChartOptionsGradient,
+    gradientColors: generateRandomHexColors(2),
+    gradientStops: [1, 0],
+  };
   // console.log(JSON.stringify(totalAlarmsPerDevicePieChartStrucucture));
 
 
@@ -160,7 +163,7 @@ CONVERTIMOS LA ESTRUCTURA DE OBJETOS ANINADOS A UN ARRAY DE OBJETOS Y TOTALIZAMO
       labels: dataToStructure[0].count.map(({ tag }) => tag),
       datasets: dataToStructure.map((device) => {
 
-        let color = generarColoresAleatorios(arrayDeObjetos.length)[0]
+        let color = generateRandomHexColors(arrayDeObjetos.length)[0]
         return {
           label: device.deviceName,
           fill: true,
