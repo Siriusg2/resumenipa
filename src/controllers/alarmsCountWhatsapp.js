@@ -6,6 +6,17 @@ const { basicOptions, barChartOptionsGradient, pieChartOptions } = require('../u
 
 const keyWords = [{ tag: "speedLimit", keyword: "superada", chartTag: "Limite de velocidad" }, { tag: "fall", keyword: "caida", chartTag: "Caida" }, { tag: "panicButton", keyword: "panico", chartTag: "Botón de panico" }, { tag: "powerOff", keyword: "apagado", chartTag: "Dispositivo apagado" }, { tag: "PowerOn", keyword: "encendido", chartTag: "Dispositivo encendido" }, { tag: "noMovement", keyword: "inactividad", chartTag: "Inactividad" }, { tag: "lowBattery", keyword: "baja", chartTag: "Bateria baja" }, { tag: "sosMode", keyword: "activado", chartTag: "Modo SOS" }, { tag: "geofenceOut", keyword: "saliendo", chartTag: "Salida geocerca" }]
 
+/**
+ * Calculates the number of alarms for each device and generates charts for the total number of alarms and the types of alarms per device.
+ *
+ * @param {Object} whatsAppData - An object containing device names and WhatsApp messages.
+ * @param {Array} whatsAppData.devicesNames - An array of objects containing device names.
+ * @param {Array} whatsAppData.whatsappMessages - An array of objects containing WhatsApp messages.
+ * @param {string} whatsAppData.devicesNames[].name - The name of a device.
+ * @param {Array} whatsAppData.whatsappMessages[].messages - An array of objects containing WhatsApp messages.
+ * @param {string} whatsAppData.whatsappMessages[].messages[].message - The content of a WhatsApp message.
+ * @return {Object} An object containing two chart structures: one for the total number of alarms per device and one for the types of alarms per device.
+ */
 const alarmsCountWhatsapp = (whatsAppData) => {
   /* ITERAMOS EN LA DATA DE LA BASE DATOS PARA ENCONTRAR LAS ALARMAS */
 
@@ -48,16 +59,12 @@ const alarmsCountWhatsapp = (whatsAppData) => {
 
   //SE PROMEDIA LA CANTIDAD DE MENSAJES ENTRE LOS NUMEROS DE CONTACTO PARA OBTENER EL VALOR REAL DE
   //LAS ALARMAS
-
   for (const root in perTypeCountStructure) {
-    let valueToSplit = devicesNames.find(({ name }) =>
+    const valueToSplit = devicesNames.find(({ name }) =>
       name.normalize("NFD").replace(/[\u0300-\u036f]/g, "") === root
     ).contactsQuantity;
 
-    //aqui añadimos las propiedades no encontradas para cada dispositivo
-    //de esta forma los datos tienen consistencia para la configuracion de los graficos
     const properties = keyWords.map(({ tag }) => tag);
-
 
     for (const property of properties) {
       if (!perTypeCountStructure[root].hasOwnProperty(property)) {
@@ -90,9 +97,8 @@ CONVERTIMOS LA ESTRUCTURA DE OBJETOS ANINADOS A UN ARRAY DE OBJETOS Y TOTALIZAMO
 
   for (const dispositivo in perTypeCountStructure) {
     if (perTypeCountStructure.hasOwnProperty(dispositivo)) {
-      let values = Object.values(perTypeCountStructure[dispositivo]);
-      let total = values.reduce((a, b) => a + b, 0);
       const alarmas = perTypeCountStructure[dispositivo];
+      const total = Object.values(alarmas).reduce((a, b) => a + b, 0);
       const objeto = { deviceName: dispositivo, ...alarmas, total };
       arrayDeObjetos.push(objeto);
     }
@@ -176,7 +182,7 @@ CONVERTIMOS LA ESTRUCTURA DE OBJETOS ANINADOS A UN ARRAY DE OBJETOS Y TOTALIZAMO
 
 
   //****************************************************************!/
-  console.log(JSON.stringify(alarmsPerTypePerDeviceBarChartStrucucture));
+  // console.log(JSON.stringify(alarmsPerTypePerDeviceBarChartStrucucture));
   return {
     totalAlarms: totalAlarmsPerDevicePieChartStrucucture,
     alarmTypes: alarmsPerTypePerDeviceBarChartStrucucture
