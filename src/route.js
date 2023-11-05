@@ -4,7 +4,7 @@ const alarmsCountWhatsapp = require('./controllers/alarmsCountWhatsapp')
 const getAllData = require('./controllers/getAllData')
 const getAllDataWhatsapp = require('./controllers/getAllDataWhatsapp')
 const traveledDistances = require('./controllers/traveledDistances')
-
+const speedAverage = require('./controllers/speedAverage')
 
 router.get('/charts-report', async (req, res) => {
     let { channelId, startDate, endDate } = req.query
@@ -20,8 +20,9 @@ router.get('/charts-report', async (req, res) => {
 
 
     let result = {
-        alarms: alarmsCountWhatsapp(allDataWhatsapp),
+        // alarms: alarmsCountWhatsapp(allDataWhatsapp),
         // distances: await traveledDistances(allData),
+        speedAverage: await speedAverage(allData),
     }
 
     return res.status(200).send(result)

@@ -88,7 +88,7 @@ const traveledDistances = async (allData) => {
     gradientStops: [1, 0],
   };
 
-  console.log(JSON.stringify(totalDistanceChartData));
+  // console.log(JSON.stringify(totalDistanceChartData));
   return {
     totalDistanceChartData,
     averageDistancePerDayChartData,
