@@ -73,7 +73,7 @@ const traveledDistances = async (allData) => {
       labels: result.map(r => r.name),
       datasets: [
         {
-          label: 'Distancia promedio por dia',
+          label: 'Promedio distancia recorrida por dia (Kms.)',
           fill: true,
           borderColor: generateRandomHexColors(1)[0],
           borderWidth: 2,

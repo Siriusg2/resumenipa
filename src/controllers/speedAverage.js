@@ -41,7 +41,7 @@ const speedAverage = async (allData) => {
             labels: result.map(r => r.name),
             datasets: [
                 {
-                    label: 'Velocidad promedio (km/h)',
+                    label: 'Velocidad promedio de paseo (km/h)',
                     fill: true,
                     borderColor: generateRandomHexColors(1)[0],
                     borderWidth: 2,

@@ -114,7 +114,7 @@ CONVERTIMOS LA ESTRUCTURA DE OBJETOS ANINADOS A UN ARRAY DE OBJETOS Y TOTALIZAMO
       labels: arrayDeObjetos.map(({ deviceName }) => deviceName),
       datasets: [
         {
-          label: 'Distancia total recorrida',
+          label: `Total de alarmas del dispositivo`,
           fill: true,
           borderColor: generateRandomHexColors(1)[0],
           borderWidth: 2,
