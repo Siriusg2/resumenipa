@@ -1,11 +1,10 @@
 const router = require('express').Router()
-const alarmsCount = require('./controllers/alarmsCount')
 const alarmsCountWhatsapp = require('./controllers/alarmsCountWhatsapp')
 const getAllData = require('./controllers/getAllData')
 const getAllDataWhatsapp = require('./controllers/getAllDataWhatsapp')
 const traveledDistances = require('./controllers/traveledDistances')
 const speedAverage = require('./controllers/speedAverage')
-
+const walksSchedule = require('./controllers/walksSchedule')
 router.get('/charts-report', async (req, res) => {
     let { channelId, startDate, endDate } = req.query
 
@@ -20,9 +19,10 @@ router.get('/charts-report', async (req, res) => {
 
 
     let result = {
-        // alarms: alarmsCountWhatsapp(allDataWhatsapp),
-        // distances: await traveledDistances(allData),
+        alarms: alarmsCountWhatsapp(allDataWhatsapp),
+        distances: await traveledDistances(allData),
         speedAverage: await speedAverage(allData),
+        frecuentWalksSchedule: await walksSchedule(allData)
     }
 
     return res.status(200).send(result)

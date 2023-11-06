@@ -74,7 +74,7 @@ const alarmsCountWhatsapp = (whatsAppData) => {
 
     for (const alarm in perTypeCountStructure[root]) {
       if (alarm === "geofenceOut") {
-        perTypeCountStructure[root][alarm] = Math.ceil(perTypeCountStructure[root][alarm] / (valueToSplit + 1));
+        perTypeCountStructure[root][alarm] = Math.ceil(perTypeCountStructure[root][alarm] / (valueToSplit + 3));
       } else {
         perTypeCountStructure[root][alarm] = Math.ceil(perTypeCountStructure[root][alarm] / valueToSplit);
       }

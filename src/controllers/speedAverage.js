@@ -10,12 +10,6 @@ const speedAverage = async (allData) => {
         .filter(data => data != undefined);
 
 
-
-    // const totalTrialDays = parseInt(
-    //     (filteredAndOrderedData[filteredAndOrderedData.length - 1].time - filteredAndOrderedData[0].time) / (1000 * 60 * 60 * 24),
-    //     10
-    // );
-
     const ids = Array.from(new Set(filteredAndOrderedData.map(data => data.dId)));
 
     const devicesNamesAndDIds = (
@@ -47,7 +41,7 @@ const speedAverage = async (allData) => {
             labels: result.map(r => r.name),
             datasets: [
                 {
-                    label: 'Distancia total recorrida',
+                    label: 'Velocidad promedio (km/h)',
                     fill: true,
                     borderColor: generateRandomHexColors(1)[0],
                     borderWidth: 2,
